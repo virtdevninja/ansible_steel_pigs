@@ -1,0 +1,81 @@
+---
+
+- name: Add the OS specific varibles
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Install the pigs_packages required for Fedora
+  dnf: name={{ item }} state=installed
+  with_items: pigs_server_packages
+  when: ansible_os_family == 'RedHat'
+
+
+- name: Install the pigs_packages required for Ubuntu
+  apt: name={{ item }} state=installed update_cache=yes
+  with_items: "{{ pigs_server_packages }}"
+  when: ansible_os_family == 'Debian'
+
+- name: Create a pigs group
+  group: name={{ pigs_wsgi_group }} system=yes state=present
+
+- name: Create a pigs user
+  user:
+    name={{ pigs_wsgi_user }}
+    state=present
+    system=yes
+    group={{ pigs_wsgi_group }}
+    createhome=no
+    home="{{ pigs_checkout_dir }}"
+    shell=/bin/false
+
+- name: Ensure the location we want to run steel_pigs exists
+  file: path={{ pigs_checkout_dir }} state=directory mode=0755
+
+- name: Check out steel_pigs from GitHub
+  git:
+    repo=https://github.com/virtdevninja/steel_pigs.git
+    dest={{ pigs_checkout_dir }}
+    force=yes
+
+- name: Install main python pip packages
+  pip: requirements={{ pigs_checkout_dir }}/requirements.txt virtualenv={{ pigs_venv_path }}
+
+- name: Enable mod_wsgi on Ubuntu
+  apache2_module: state=present name="{{ item }}"
+  with_items: "{{ pigs_apache_modules }}"
+  when: ansible_os_family == 'Debian'
+
+- name: Enable mod_wsgi on Fedora
+  copy:
+    src: apache-conf.modules.d/
+    dest: /etc/httpd/conf.modules.d/
+  when: ansible_os_family == 'RedHat'
+
+- name: Place vHost file on Ubuntu
+  template:
+    src: steel_pigs_vhost.j2
+    dest: /etc/apache2/sites-enabled/steel_pigs.conf
+  when: ansible_os_family == 'Debian'
+
+- name: Remove default vhost from Ubuntu
+  file: path=/etc/apache2/sites-enabled/000-default.conf state=absent
+  when: ansible_os_family == 'Debian'
+
+- name: Place vHost file on Fedora
+  template:
+    src: steel_pigs_vhost.j2
+    dest: /etc/httpd/conf.d/steel_pigs_vhost.conf
+  when: ansible_os_family == 'RedHat'
+
+- name: Place application wsgi file in source dir
+  template:
+    src: steel_pigs.wsgi
+    dest: '{{ pigs_checkout_dir }}/steel_pigs.wsgi'
+
+- name: Place pigs_config on server
+  template:
+    src: pigs_config.j2
+    dest: '{{ pigs_checkout_dir }}/steel_pigs/pigs_config.py'
+
+- name: Restart server services
+  service: name={{ item }} state=restarted enabled=yes
+  with_items: "{{ pigs_server_services }}"
