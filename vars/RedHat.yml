@@ -1,0 +1,12 @@
+pigs_server_packages:
+  - httpd
+  - python-pip
+  - python-virtualenv
+  - mod_wsgi
+  - git
+
+pigs_server_services:
+  - httpd
+
+pigs_apache_modules:
+  - none

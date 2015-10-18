@@ -1,0 +1,13 @@
+pigs_server_packages:
+  - apache2
+  - libapache2-mod-wsgi
+  - python-pip
+  - python-virtualenv
+  - git
+
+pigs_server_services:
+  - apache2
+
+pigs_apache_modules:
+  - wsgi
+  - vhost_alias
