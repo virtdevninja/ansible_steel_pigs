@@ -1,0 +1,53 @@
+---
+
+# Default variables for this role
+
+pigs_dns_domain_name: pxe.rpc.local
+pigs_wsgi_port: 8000
+pigs_public_port: 80
+
+# This is the location on the file system where you want to git clone
+# the steel_pigs repo.
+pigs_checkout_dir: /var/www/steel_pigs
+pigs_venv_path: "{{ pigs_checkout_dir }}/venv"
+pigs_html_home: /var/www/html
+pigs_wsgi_user: steelpigs
+pigs_wsgi_group: steelpigs
+pigs_wsgi_procs: 50
+
+pigs_configs_provider_plugin:
+  - Opt1:
+      name: "namespace"
+      value: "steel_pigs.plugins.providers.sql"
+  - Opt2:
+      name: "class"
+      value: "SQL"
+  - Opt3:
+      name: "engine"
+      value: "sqlite:///:memory:"
+
+pigs_configs_version_plugin:
+  - Opt1:
+      name: "namespace"
+      value: "steel_pigs.plugins.providers.static_version"
+  - Opt2:
+      name: "class"
+      value: "StaticVersionProvider"
+
+pigs_configs_pxe_plugin:
+  - Opt1:
+      name: "namespace"
+      value: "steel_pigs.plugins.providers.static_pxe_provider"
+  - Opt2:
+      name: "class"
+      value: "StaticPXEProvider"
+
+pigs_configs_formatter_plugin:
+  - Opt1:
+      name: "namespace"
+      value: "steel_pigs.plugins.providers.noformat"
+  - Opt2:
+      name: "class"
+      value: "NoFormatProvider"
+
+pigs_configs_secret_key: "Some random string here for use with the flask_wtf forms."

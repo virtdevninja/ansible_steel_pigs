@@ -1,0 +1,17 @@
+<VirtualHost *:{{ pigs_public_port }}>
+    DocumentRoot {{ pigs_html_home }}
+
+    HeaderName /html/pigs_header.html
+    ReadmeName /html/pigs_footer.html
+
+    WSGIDaemonProcess steel_pigs user={{ pigs_wsgi_user }} group={{ pigs_wsgi_group }} processes={{ pigs_wsgi_procs }}
+    WSGIScriptAlias /miniplop {{ pigs_checkout_dir }}/steel_pigs.wsgi
+
+    <Directory {{ pigs_checkout_dir }}>
+        WSGIProcessGroup steel_pigs
+        WSGIApplicationGroup %{GLOBAL}
+        Order deny,allow
+        Allow from all
+    </Directory>
+
+</VirtualHost>
