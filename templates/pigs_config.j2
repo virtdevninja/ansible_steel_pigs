@@ -43,5 +43,12 @@ FORMATTER_PROVIDER_PLUGIN = { {% for item in pigs_configs_formatter_plugin -%}
 {%- endfor %}
 }
 
+PROVISION_PROVIDER_PLUGIN = { {% for item in pigs_configs_provision_provider_plugin -%}
+    {% for opt, values in item.iteritems() %}
+        "{{ values['name'] }}": "{{ values['value'] }}",
+    {%- endfor %}
+{%- endfor %}
+}
+
 # the app key for the flask app. This can be anything, and should be random and private
 SECRET_KEY = "{{ pigs_configs_secret_key }}"
