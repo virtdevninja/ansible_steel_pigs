@@ -50,4 +50,12 @@ pigs_configs_formatter_plugin:
       name: "class"
       value: "NoFormatProvider"
 
+pigs_configs_provision_provider_plugin:
+  - Opt1:
+      name: "namespace"
+      value: "steel_pigs.plugins.providers.rpc_os_provision"
+  - Opt2:
+      name: "class"
+      value: "RPCProvision"
+
 pigs_configs_secret_key: "Some random string here for use with the flask_wtf forms."
